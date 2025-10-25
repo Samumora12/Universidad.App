@@ -80,6 +80,35 @@ function Sidebar() {
           </li>
         )}
 
+        {/* Nav Item - Mis Docentes - SOLO Admin */}
+        {isAdmin && (
+          <li className="nav-item">
+            <a
+              className="nav-link collapsed"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                toggleDropdown('misDocentes');
+              }}
+              aria-expanded={openDropdown === 'misDocentes'}
+            >
+              <i className="fas fa-fw fa-chalkboard-teacher"></i>
+              <span>Mis Docentes</span>
+            </a>
+            <div 
+              className={`collapse ${openDropdown === 'misDocentes' ? 'show' : ''}`}
+              id="collapseMisDocentes"
+            >
+              <div className="bg-white py-2 collapse-inner rounded">
+                <h6 className="collapse-header">Acciones:</h6>
+                <Link className="collapse-item" to="/ListarDocente">Ver Docentes</Link>
+                <Link className="collapse-item" to="/CrearDocente">Registrar Docente</Link>
+              </div>
+            </div>
+          </li>
+        )}
+
+
         {/* Nav Item - Historial estudiantil - TODOS pueden ver el suyo */}
         <li className="nav-item">
           <a

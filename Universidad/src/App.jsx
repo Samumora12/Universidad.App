@@ -20,6 +20,11 @@ import ListarAsistencia from "./Pages/ListarAsistencia";
 import CrearAsistencia from "./Pages/CrearAsistencia";
 import ListarBienestar from "./Pages/ListarBienestar";
 import CrearBienestar from "./Pages/CrearBienestar";
+import EditarEstudiante from "./Pages/EditarEstudiante";
+import ListarDocente from "./Pages/ListarDocente";
+import CrearDocente from "./Pages/CrearDocente";
+import EditarDocente from "./Pages/EditarDocente";
+
 
 function App() {
   return (
@@ -77,6 +82,13 @@ function App() {
               </PrivateRoute>
             }
           />
+
+          <Route path="/EditarEstudiante" element={<EditarEstudiante />} />
+          <Route path="/ListarDocente" element={<ListarDocente />} />
+          <Route path="/CrearDocente" element={<CrearDocente />} />
+          <Route path="/EditarDocente" element={<EditarDocente />} />
+
+
 
           {/* Historial - Todos pueden ver */}
           <Route path="/ListarHistorial" element={<ListarHistorial />} />
