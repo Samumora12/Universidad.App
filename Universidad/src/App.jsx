@@ -1,4 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
+
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
 import Dashboard from "./Pages/Dashboard";
@@ -18,40 +21,136 @@ import CrearAsistencia from "./Pages/CrearAsistencia";
 import ListarBienestar from "./Pages/ListarBienestar";
 import CrearBienestar from "./Pages/CrearBienestar";
 
-
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      {/* 🔹 Rutas privadas (con sidebar y topbar) */}
-      <Route element={<Dash/>}>
-        <Route path="/Dashboard" element={<Dashboard />} />
-        <Route path="/perfil" element={<Perfil />} />
-        <Route path="/estadisticas" element={<Estadisticas />} />
+    <AuthProvider>
+      <Routes>
+        {/* Rutas públicas */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        
+        {/* Redirigir la raíz al dashboard si está autenticado, o al login si no */}
+        <Route 
+          path="/" 
+          element={
+            <PrivateRoute>
+              <Navigate to="/dashboard" replace />
+            </PrivateRoute>
+          } 
+        />
 
-        <Route path="/ListarEstudiante" element={<ListarEstudiante />} />
-        <Route path="/CrearEstudiante" element={<CrearEstudiante />} />
+        {/* Rutas privadas (con sidebar y topbar) */}
+        <Route
+          element={
+            <PrivateRoute>
+              <Dash />
+            </PrivateRoute>
+          }
+        >
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/perfil" element={<Perfil />} />
 
-        <Route path="/ListarHistorial" element={<ListarHistorial />} />
-        <Route path="/CrearHistorial" element={<CrearHistorial />} />
+          {/* Estadísticas - Solo Docentes y Admin */}
+          <Route
+            path="/estadisticas"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <Estadisticas />
+              </PrivateRoute>
+            }
+          />
 
-        <Route path="/ListarFamiliar" element={<ListarFamiliar />} />
-        <Route path="/CrearFamiliar" element={<CrearFamiliar />} />
+          {/* Gestión de Estudiantes - Solo Docentes y Admin */}
+          <Route
+            path="/ListarEstudiante"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <ListarEstudiante />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/CrearEstudiante"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <CrearEstudiante />
+              </PrivateRoute>
+            }
+          />
 
-        <Route path="/ListarNota" element={<ListarNota />} />
-        <Route path="/CrearNota" element={<CrearNota />} />
+          {/* Historial - Todos pueden ver */}
+          <Route path="/ListarHistorial" element={<ListarHistorial />} />
+          
+          {/* Crear Historial - Solo Docentes y Admin */}
+          <Route
+            path="/CrearHistorial"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <CrearHistorial />
+              </PrivateRoute>
+            }
+          />
 
-        <Route path="/ListarAsistencia" element={<ListarAsistencia />} />
-        <Route path="/CrearAsistencia" element={<CrearAsistencia />} />
+          {/* Módulo Familiar - Docentes, Admin y Empresarios */}
+          <Route
+            path="/ListarFamiliar"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador", "Empresario"]}>
+                <ListarFamiliar />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/CrearFamiliar"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador", "Empresario"]}>
+                <CrearFamiliar />
+              </PrivateRoute>
+            }
+          />
 
-        <Route path="/ListarBienestar" element={<ListarBienestar />} />
-        <Route path="/CrearBienestar" element={<CrearBienestar />} />
-      </Route>
-    </Routes>
+          {/* Notas - Todos pueden ver */}
+          <Route path="/ListarNota" element={<ListarNota />} />
+          
+          {/* Crear/Registrar Notas - Solo Docentes y Admin */}
+          <Route
+            path="/CrearNota"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <CrearNota />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Asistencias - Todos pueden ver */}
+          <Route path="/ListarAsistencia" element={<ListarAsistencia />} />
+          
+          {/* Registrar Asistencias - Solo Docentes y Admin */}
+          <Route
+            path="/CrearAsistencia"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <CrearAsistencia />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Bienestar - Todos pueden ver */}
+          <Route path="/ListarBienestar" element={<ListarBienestar />} />
+          
+          {/* Crear registros de Bienestar - Solo Docentes y Admin */}
+          <Route
+            path="/CrearBienestar"
+            element={
+              <PrivateRoute allowedRoles={["Docente", "Administrador"]}>
+                <CrearBienestar />
+              </PrivateRoute>
+            }
+          />
+        </Route>
+      </Routes>
+    </AuthProvider>
   );
 }
 
 export default App;
-
