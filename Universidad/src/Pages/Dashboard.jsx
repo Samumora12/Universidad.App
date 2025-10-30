@@ -1,75 +1,52 @@
-import api from '../services/api';
-import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useEffect, useState } from 'react';
-
-
+import React from "react";
 
 const Dashboard = () => {
-  const { user } = useAuth();
-  const [datos, setDatos] = useState(null);
-  // Verificar roles
-  const isEstudiante = user?.rol === 'Estudiante';
-  const isDocente = user?.rol === 'Docente';
-  const isAdmin = user?.rol === 'Administrador';
-
-  useEffect(() => {
-    api.get('/dashboard')
-      .then(res => setDatos(res.data))
-      .catch(err => console.error(err));
-  }, []);
-
   return (
     <>
+      {/* Begin Page Content */}
       <div className="container-fluid">
+
         {/* Page Heading */}
         <div className="d-sm-flex align-items-center justify-content-between mb-4">
-          <h1 className="h3 mb-0 text-gray-800">
-            Dashboard - Bienvenido {user?.nombre}
-          </h1>
-          
-          {/* Solo mostrar botón de reporte si es Docente o Admin */}
-          {(isDocente || isAdmin) && (
-            <a
-              href="#"
-              className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
-            >
-              <i className="fas fa-download fa-sm text-white-50"></i> Generar Reporte
-            </a>
-          )}
+          <h1 className="h3 mb-0 text-gray-800">Dashboard</h1>
+          <a
+            href="#"
+            className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+          >
+            <i className="fas fa-download fa-sm text-white-50"></i> Generar Reporte
+          </a>
         </div>
 
         {/* Content Row */}
         <div className="row">
-          {/* Total Estudiantes - Solo para Docente y Admin */}
-          {(isDocente || isAdmin) && (
-            <div className="col-xl-3 col-md-6 mb-4">
-              <div className="card border-left-primary shadow h-100 py-2">
-                <div className="card-body">
-                  <div className="row no-gutters align-items-center">
-                    <div className="col mr-2">
-                      <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                        Total Estudiantes
-                      </div>
-                      <div className="h5 mb-0 font-weight-bold text-gray-800">245</div>
+
+          {/* Total Estudiantes */}
+          <div className="col-xl-3 col-md-6 mb-4">
+            <div className="card border-left-primary shadow h-100 py-2">
+              <div className="card-body">
+                <div className="row no-gutters align-items-center">
+                  <div className="col mr-2">
+                    <div className="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                      Total Estudiantes
                     </div>
-                    <div className="col-auto">
-                      <i className="fas fa-user-graduate fa-2x text-gray-300"></i>
-                    </div>
+                    <div className="h5 mb-0 font-weight-bold text-gray-800">245</div>
+                  </div>
+                  <div className="col-auto">
+                    <i className="fas fa-user-graduate fa-2x text-gray-300"></i>
                   </div>
                 </div>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Asistencia - Todos pueden ver */}
+          {/* Asistencia Mensual */}
           <div className="col-xl-3 col-md-6 mb-4">
             <div className="card border-left-success shadow h-100 py-2">
               <div className="card-body">
                 <div className="row no-gutters align-items-center">
                   <div className="col mr-2">
                     <div className="text-xs font-weight-bold text-success text-uppercase mb-1">
-                      {isEstudiante ? 'Mi Asistencia (Mes)' : 'Asistencia (Mes)'}
+                      Asistencia (Mes)
                     </div>
                     <div className="h5 mb-0 font-weight-bold text-gray-800">92%</div>
                   </div>
@@ -81,14 +58,14 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Rendimiento */}
+          {/* Rendimiento Académico */}
           <div className="col-xl-3 col-md-6 mb-4">
             <div className="card border-left-info shadow h-100 py-2">
               <div className="card-body">
                 <div className="row no-gutters align-items-center">
                   <div className="col mr-2">
                     <div className="text-xs font-weight-bold text-info text-uppercase mb-1">
-                      {isEstudiante ? 'Mi Rendimiento' : 'Rendimiento'}
+                      Rendimiento
                     </div>
                     <div className="row no-gutters align-items-center">
                       <div className="col-auto">
@@ -101,7 +78,7 @@ const Dashboard = () => {
                           <div
                             className="progress-bar bg-info"
                             role="progressbar"
-                            style={{ width: '78%' }}
+                            style={{ width: "78%" }}
                             aria-valuenow="78"
                             aria-valuemin="0"
                             aria-valuemax="100"
@@ -125,7 +102,7 @@ const Dashboard = () => {
                 <div className="row no-gutters align-items-center">
                   <div className="col mr-2">
                     <div className="text-xs font-weight-bold text-warning text-uppercase mb-1">
-                      {isEstudiante ? 'Mis Pendientes' : 'Pendientes'}
+                      Pendientes
                     </div>
                     <div className="h5 mb-0 font-weight-bold text-gray-800">12</div>
                   </div>
@@ -138,49 +115,52 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Gráficos - Solo para Docente y Admin */}
-        {(isDocente || isAdmin) && (
-          <div className="row">
-            <div className="col-xl-8 col-lg-7">
-              <div className="card shadow mb-4">
-                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 className="m-0 font-weight-bold text-primary">
-                    Rendimiento por Asignatura
-                  </h6>
-                </div>
-                <div className="card-body">
-                  <div className="chart-area">
-                    <canvas id="rendimientoChart"></canvas>
-                  </div>
-                </div>
-              </div>
-            </div>
+        {/* Content Row */}
+        <div className="row">
 
-            <div className="col-xl-4 col-lg-5">
-              <div className="card shadow mb-4">
-                <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                  <h6 className="m-0 font-weight-bold text-primary">
-                    Distribución por Grado
-                  </h6>
-                </div>
-                <div className="card-body">
-                  <div className="chart-pie pt-4 pb-2">
-                    <canvas id="gradoChart"></canvas>
-                  </div>
-                  <div className="mt-4 text-center small">
-                    <span className="mr-2">
-                      <i className="fas fa-circle text-primary"></i> Primaria
-                    </span>
-                    <span className="mr-2">
-                      <i className="fas fa-circle text-success"></i> Secundaria
-                    </span>
-                  </div>
+          {/* Gráfico de Rendimiento */}
+          <div className="col-xl-8 col-lg-7">
+            <div className="card shadow mb-4">
+              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 className="m-0 font-weight-bold text-primary">
+                  Rendimiento por Asignatura
+                </h6>
+              </div>
+              <div className="card-body">
+                <div className="chart-area">
+                  <canvas id="rendimientoChart"></canvas>
                 </div>
               </div>
             </div>
           </div>
-        )}
+
+          {/* Distribución por Grado */}
+          <div className="col-xl-4 col-lg-5">
+            <div className="card shadow mb-4">
+              <div className="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                <h6 className="m-0 font-weight-bold text-primary">
+                  Distribución por Grado
+                </h6>
+              </div>
+              <div className="card-body">
+                <div className="chart-pie pt-4 pb-2">
+                  <canvas id="gradoChart"></canvas>
+                </div>
+                <div className="mt-4 text-center small">
+                  <span className="mr-2">
+                    <i className="fas fa-circle text-primary"></i> Primaria
+                  </span>
+                  <span className="mr-2">
+                    <i className="fas fa-circle text-success"></i> Secundaria
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+      {/* End Page Content */}
     </>
   );
 };

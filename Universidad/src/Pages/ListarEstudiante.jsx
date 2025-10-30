@@ -1,192 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import api from '../services/api';
-import { useAuth } from '../context/AuthContext';
+import React from 'react'
+import { Link } from 'react-router-dom'
 
-function ListarEstudiante() {
-  const [estudiantes, setEstudiantes] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  
-  const navigate = useNavigate();
-  const { user } = useAuth();
-
-  useEffect(() => {
-    cargarEstudiantes();
-  }, []);
-
-  const cargarEstudiantes = async () => {
-    try {
-      setLoading(true);
-      const response = await api.get('/usuarios');
-      
-      const estudiantesFiltrados = response.data.filter(
-        (usuario) => usuario.rol === 'Estudiante'
-      );
-      
-      setEstudiantes(estudiantesFiltrados);
-      setError('');
-    } catch (err) {
-      console.error('Error al cargar estudiantes:', err);
-      setError('Error al cargar la lista de estudiantes');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleEditar = (estudiante) => {
-    navigate('/EditarEstudiante', { state: { estudiante } });
-  };
-
-  const abrirModalEliminar = (estudiante) => {
-    setEstudianteAEliminar(estudiante);
-    setShowModal(true);
-  };
-
-  const cerrarModal = () => {
-    setEstudianteAEliminar(null);
-    setShowModal(false);
-  };
-
-  const confirmarEliminar = async () => {
-    if (!estudianteAEliminar || !estudianteAEliminar.correo) {
-      alert('No se puede eliminar: correo de estudiante no disponible');
-      return;
-    }
-
-    try {
-      // Paso 1: Buscar el ID del estudiante usando el nuevo endpoint
-      const estudianteResponse = await api.get(`/usuarios/correo/${estudianteAEliminar.correo}`);
-      
-      if (!estudianteResponse.data || !estudianteResponse.data.id) {
-        alert('Error: No se pudo encontrar el ID del estudiante');
-        return;
-      }
-
-      // Paso 2: Buscar el ID del admin
-      const adminResponse = await api.get(`/usuarios/correo/${user?.correo}`);
-      
-      if (!adminResponse.data || !adminResponse.data.id) {
-        alert('Error: No se pudo obtener el ID del administrador');
-        return;
-      }
-
-      // Paso 3: Eliminar usando los IDs obtenidos
-      await api.delete(`/usuarios/admin/${adminResponse.data.id}/usuarios/${estudianteResponse.data.id}`);
-      
-      alert('Estudiante eliminado correctamente');
-      cerrarModal();
-      cargarEstudiantes();
-    } catch (err) {
-      console.error('Error al eliminar estudiante:', err);
-      alert(err.response?.data || 'Error al eliminar el estudiante');
-    }
-  };
-
+export default function ListarEstudiante() {
   return (
-    <div className="container-fluid">
-      {/* Page Heading */}
-      <div className="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 className="h3 mb-0 text-gray-800">Mis Estudiantes</h1>
-      </div>
+    <div>
+      <div id="wrapper">
+  {/* Sidebar */}
+  <div id="sidebar-wrapper"></div>
 
-      {/* Tabla de Estudiantes */}
-      <div className="card shadow mb-4">
-        <div className="card-header py-3">
-          <h6 className="m-0 font-weight-bold text-primary">
-            Lista de Estudiantes Registrados
-          </h6>
-        </div>
-        <div className="card-body">
-          {loading ? (
-            <div className="text-center">
-              <div className="spinner-border text-primary" role="status">
-                <span className="sr-only">Cargando...</span>
-              </div>
-            </div>
-          ) : error ? (
-            <div className="alert alert-danger" role="alert">
-              {error}
-            </div>
-          ) : estudiantes.length === 0 ? (
-            <div className="alert alert-info" role="alert">
-              No hay estudiantes registrados.
-            </div>
-          ) : (
-            <div className="table-responsive">
-              <table className="table table-bordered" width="100%" cellSpacing="0">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Rol</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {estudiantes.map((estudiante, index) => (
-                    <tr key={index}>
-                      <td>{estudiante.nombre}</td>
-                      <td>{estudiante.correo}</td>
-                      <td>
-                        <span className="badge badge-primary">
-                          {estudiante.rol}
-                        </span>
-                      </td>
-                      <td>
-                        <button 
-                          className="btn btn-sm btn-warning mr-2"
-                          onClick={() => handleEditar(estudiante)}
-                        >
-                          <i className="fas fa-edit"></i> Editar
-                        </button>
-                        <button 
-                          className="btn btn-sm btn-danger"
-                          onClick={() => abrirModalEliminar(estudiante)}
-                        >
-                          <i className="fas fa-trash"></i> Eliminar
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      </div>
+  {/* Content Wrapper */}
+  <div id="content-wrapper" className="d-flex flex-column">
+    {/* Main Content */}
+    <div id="content">
+      {/* Topbar */}
+      <div id="topbar-wrapper"></div>
 
-      {/* Modal de Confirmación de Eliminación */}
-      {showModal && (
-        <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={cerrarModal}>
-          <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-content">
-              <div className="modal-header">
-                <h5 className="modal-title">Confirmar Eliminación</h5>
-                <button type="button" className="close" onClick={cerrarModal}>
-                  <span>&times;</span>
-                </button>
+      {/* Begin Page Content */}
+      <div className="container-fluid">
+        {/* Page Heading */}
+        <div className="d-sm-flex align-items-center justify-content-between mb-4">
+          <h1 className="h3 mb-0 text-gray-800">Crear Estudiante</h1>
+          <Link
+            to={`/CrearEstudiante`}
+            className="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"
+          >
+            <i className="fas fa-list fa-sm text-white-50"></i> Listado
+          </Link>
+        </div>
+
+        {/* Content Row */}
+        <div className="row">
+          <div className="col-8">
+            <form id="form-estudiante">
+              {/* Nombre */}
+              <div className="form-group row">
+                <div className="col-sm-6 mb-3 mb-sm-0">
+                  <label className="form-label" htmlFor="nombre-estudiante">
+                    Nombre
+                  </label>
+                  <input
+                    type="text"
+                    id="nombre-estudiante"
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label" htmlFor="apellido-estudiante">
+                    Apellido
+                  </label>
+                  <input
+                    type="text"
+                    id="apellido-estudiante"
+                    className="form-control"
+                    required
+                  />
+                </div>
               </div>
-              <div className="modal-body">
-                <p>¿Estás seguro de que deseas eliminar al estudiante <strong>{estudianteAEliminar?.nombre}</strong>?</p>
-                <p className="text-danger"><small>Esta acción no se puede deshacer.</small></p>
+
+              {/* Email */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="email-estudiante">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  id="email-estudiante"
+                  className="form-control"
+                  required
+                />
               </div>
-              <div className="modal-footer">
-                <button type="button" className="btn btn-secondary" onClick={cerrarModal}>
-                  Cancelar
-                </button>
-                <button type="button" className="btn btn-danger" onClick={confirmarEliminar}>
-                  Eliminar
-                </button>
+
+              {/* Celular */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="celular-estudiante">
+                  Celular
+                </label>
+                <input
+                  type="tel"
+                  id="celular-estudiante"
+                  className="form-control"
+                  required
+                />
               </div>
-            </div>
+
+              {/* Grado */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="grado-estudiante">
+                  Grado
+                </label>
+                <select
+                  id="grado-estudiante"
+                  className="form-control"
+                  required
+                >
+                  <option value="">Seleccionar Grado</option>
+                  <option value="1°">1° Primaria</option>
+                  <option value="2°">2° Primaria</option>
+                  <option value="3°">3° Primaria</option>
+                  <option value="4°">4° Primaria</option>
+                  <option value="5°">5° Primaria</option>
+                  <option value="6°">6° Primaria</option>
+                  <option value="7°">7° Secundaria</option>
+                  <option value="8°">8° Secundaria</option>
+                  <option value="9°">9° Secundaria</option>
+                  <option value="10°">10° Secundaria</option>
+                  <option value="11°">11° Secundaria</option>
+                </select>
+              </div>
+
+              {/* Direcciones */}
+              <div className="form-group row">
+                <div className="col-sm-6 mb-3 mb-sm-0">
+                  <label className="form-label" htmlFor="direccion-estudiante">
+                    Dirección Principal
+                  </label>
+                  <input
+                    type="text"
+                    id="direccion-estudiante"
+                    className="form-control"
+                    required
+                  />
+                </div>
+                <div className="col-sm-6">
+                  <label className="form-label" htmlFor="direccion2-estudiante">
+                    Dirección Secundaria
+                  </label>
+                  <input
+                    type="text"
+                    id="direccion2-estudiante"
+                    className="form-control"
+                  />
+                </div>
+              </div>
+
+              {/* Información Académica */}
+              <div className="form-group">
+                <label className="form-label" htmlFor="info-academica">
+                  Información Académica
+                </label>
+                <textarea
+                  className="form-control"
+                  id="info-academica"
+                  rows="4"
+                ></textarea>
+              </div>
+
+              {/* Botones */}
+              <button
+                type="button"
+                className="btn-create btn btn-primary btn-block mb-4"
+              >
+                Crear Estudiante
+              </button>
+              <button
+                type="button"
+                className="d-none btn-update btn btn-success btn-block mb-4"
+              >
+                Actualizar Estudiante
+              </button>
+            </form>
           </div>
         </div>
-      )}
+      </div>
+      {/* /.container-fluid */}
     </div>
-  );
+    {/* End of Main Content */}
+  </div>
+  {/* End of Content Wrapper */}
+</div>
+    </div>
+  )
 }
-
-export default ListarEstudiante;

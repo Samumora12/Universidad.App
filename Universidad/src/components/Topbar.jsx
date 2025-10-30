@@ -5,9 +5,6 @@ import { useAuth } from "../context/AuthContext";
 export default function Topbar() {
   const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
 
   if (!user) return null; // No mostrar topbar si no hay usuario logueado
 
@@ -29,17 +26,23 @@ export default function Topbar() {
         <i className="fa fa-bars"></i>
       </button>
 
-  const closeDropdown = () => {
-    setDropdownOpen(false);
-  };
-
-    // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
+      {/* Topbar Search */}
+      <form className="d-none d-sm-inline-block form-inline mr-auto ml-md-3 my-2 my-md-0 mw-100 navbar-search">
+        <div className="input-group">
+          <input
+            type="text"
+            className="form-control bg-light border-0 small"
+            placeholder="Buscar..."
+            aria-label="Search"
+            aria-describedby="basic-addon2"
+          />
+          <div className="input-group-append">
+            <button className="btn btn-primary" type="button">
+              <i className="fas fa-search fa-sm"></i>
+            </button>
+          </div>
+        </div>
+      </form>
 
       {/* Topbar Navbar */}
       <ul className="navbar-nav ml-auto">
@@ -65,13 +68,7 @@ export default function Topbar() {
               src="img/undraw_profile.svg"
               alt="Perfil"
             />
-            <div className="input-group-append">
-              <button className="btn btn-primary" type="button">
-                <i className="fas fa-search fa-sm"></i>
-              </button>
-            </div>
-          </div>
-        </form>
+          </a>
 
           {/* Dropdown - User Information */}
           <div

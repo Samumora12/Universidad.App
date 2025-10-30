@@ -134,7 +134,6 @@ function Register() {
                   <button
                     type="submit"
                     className="btn btn-primary btn-user btn-block"
-                    disabled={loading}
                   >
                     Crear cuenta
                   </button>
