@@ -1,124 +1,116 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+// src/pages/Login.jsx
+import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // ✅ Importamos el contexto
 
-export default function Login() {
-  const [formData, setFormData] = useState({
-    correo: '',
-    contraseña: '',
-    rememberMe: false,
-  });
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  
-  const { login } = useAuth();
+const Login = () => {
+  const { users, loginUser } = useAuth(); // ✅ Obtenemos la lista de usuarios y función del contexto
   const navigate = useNavigate();
 
+  const [formData, setFormData] = useState({
+    email: "",
+    password: "",
+  });
+
   const handleChange = (e) => {
-    const { id, value, type, checked } = e.target;
     setFormData({
       ...formData,
-      [id]: type === 'checkbox' ? checked : value,
+      [e.target.name]: e.target.value,
     });
   };
 
-  const handleSubmit = async (e) => {
+  const handleLogin = (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
 
-    // Validaciones básicas
-    if (!formData.correo || !formData.contraseña) {
-      setError('Por favor completa todos los campos');
-      setLoading(false);
+    const { email, password } = formData;
+
+    if (!email || !password) {
+      alert("⚠️ Por favor completa todos los campos.");
       return;
     }
 
-    try {
-      const userData = await login(formData.correo, formData.contraseña);
-      
-      // Redirigir al dashboard
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.message || 'Error al iniciar sesión. Verifica tus credenciales.');
-    } finally {
-      setLoading(false);
+    console.log("🔍 Intentando iniciar sesión con:", formData);
+
+    // Verificamos si el usuario existe en los registrados (localStorage)
+    const userFound = users.find(
+      (u) => u.email === email && u.password === password
+    );
+
+    if (!userFound) {
+      alert("❌ Usuario o contraseña incorrectos.");
+      return;
     }
+
+    // Si existe, llamamos a loginUser (que ya guarda el usuario activo y redirige)
+    loginUser(email, password);
+
+    console.log("✅ Usuario autenticado:", userFound);
   };
 
   return (
     <div>
       <div className="container">
+        {/* Outer Row */}
         <div className="row justify-content-center">
           <div className="col-xl-10 col-lg-12 col-md-9">
             <div className="card o-hidden border-0 shadow-lg my-5">
               <div className="card-body p-0">
+                {/* Nested Row within Card Body */}
                 <div className="row">
                   <div className="col-lg-6 d-none d-lg-block bg-login-image"></div>
                   <div className="col-lg-6">
                     <div className="p-5">
                       <div className="text-center">
-                        <h1 className="h4 text-gray-900 mb-4">¡Bienvenido de nuevo!</h1>
+                        <h1 className="h4 text-gray-900 mb-4">
+                          ¡Bienvenido de nuevo!
+                        </h1>
                       </div>
-
-                      {error && (
-                        <div className="alert alert-danger" role="alert">
-                          {error}
-                        </div>
-                      )}
-
-                      <form className="user" onSubmit={handleSubmit}>
+                      <form className="user" onSubmit={handleLogin}>
                         <div className="form-group">
                           <input
                             type="email"
+                            name="email"
                             className="form-control form-control-user"
-                            id="correo"
-                            placeholder="Ingresa tu correo electrónico..."
-                            value={formData.correo}
+                            placeholder="Correo electrónico..."
+                            value={formData.email}
                             onChange={handleChange}
-                            disabled={loading}
+                            required
                           />
                         </div>
                         <div className="form-group">
                           <input
                             type="password"
+                            name="password"
                             className="form-control form-control-user"
-                            id="contraseña"
                             placeholder="Contraseña"
-                            value={formData.contraseña}
+                            value={formData.password}
                             onChange={handleChange}
-                            disabled={loading}
+                            required
                           />
-                        </div>
-                        <div className="form-group">
-                          <div className="custom-control custom-checkbox small">
-                            <input
-                              type="checkbox"
-                              className="custom-control-input"
-                              id="rememberMe"
-                              checked={formData.rememberMe}
-                              onChange={handleChange}
-                              disabled={loading}
-                            />
-                            <label
-                              className="custom-control-label"
-                              htmlFor="rememberMe"
-                            >
-                              Recordarme
-                            </label>
-                          </div>
                         </div>
                         <button
                           type="submit"
-                          className="btn btn-primary btn-user btn-block"
-                          disabled={loading}
+                          className="btnLogin btn btn-primary btn-user btn-block"
                         >
-                          {loading ? 'Iniciando sesión...' : 'Iniciar Sesión'}
+                          Iniciar sesión
                         </button>
+                        <hr />
+                        <a
+                          href="#"
+                          className="btn btn-google btn-user btn-block"
+                        >
+                          <i className="fab fa-google fa-fw"></i> Iniciar con Google
+                        </a>
+                        <a
+                          href="#"
+                          className="btn btn-facebook btn-user btn-block"
+                        >
+                          <i className="fab fa-facebook-f fa-fw"></i> Iniciar con Facebook
+                        </a>
                       </form>
                       <hr />
                       <div className="text-center">
-                        <a className="small" href="#">
+                        <a className="small" href="forgot-password.html">
                           ¿Olvidaste tu contraseña?
                         </a>
                       </div>
@@ -134,7 +126,9 @@ export default function Login() {
             </div>
           </div>
         </div>
-      </div>
+      </div> 
     </div>
   );
-}
+};
+
+export default Login;
