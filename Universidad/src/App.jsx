@@ -1,6 +1,4 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import { AuthProvider } from "./context/AuthContext";
-import PrivateRoute from "./components/PrivateRoute";
 
 import Login from "./Pages/Login";
 import Register from "./Pages/Register";
@@ -20,7 +18,7 @@ import ListarAsistencia from "./Pages/ListarAsistencia";
 import CrearAsistencia from "./Pages/CrearAsistencia";
 import ListarBienestar from "./Pages/ListarBienestar";
 import CrearBienestar from "./Pages/CrearBienestar";
-import PrivateRoute from "./Routes/PrivateRoute";
+import PrivateRoute from "../src/Routes/PrivateRoute";
 
 function App() {
   return (

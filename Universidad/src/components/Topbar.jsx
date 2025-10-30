@@ -1,23 +1,38 @@
-import React from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 export default function Topbar() {
   const { user, logoutUser } = useAuth();
   const navigate = useNavigate();
-  const { user, logout } = useAuth();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   if (!user) return null; // No mostrar topbar si no hay usuario logueado
 
-  // Prefijo según rol para rutas
-  const prefix = user.rol.toLowerCase(); // admin, profesor, estudiante
+  const prefix = user.rol.toLowerCase();
 
   const handleLogout = () => {
-    logoutUser(); // limpia el usuario activo
-    navigate("/login"); // redirige al login
+    logoutUser();
+    navigate("/login");
   };
+
+  const closeDropdown = () => {
+    setDropdownOpen(false);
+  };
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <nav className="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
@@ -29,20 +44,8 @@ export default function Topbar() {
         <i className="fa fa-bars"></i>
       </button>
 
-  const closeDropdown = () => {
-    setDropdownOpen(false);
-  };
-
-    // Cerrar dropdown al hacer clic fuera
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setDropdownOpen(false);
-      }
-    };
-
       {/* Topbar Navbar */}
-      <ul className="navbar-nav ml-auto">
+      <ul className="navbar-nav ml-auto" ref={dropdownRef}>
         {/* Nav Item - User Information */}
         <li className="nav-item dropdown no-arrow">
           <a
@@ -52,7 +55,8 @@ export default function Topbar() {
             role="button"
             data-toggle="dropdown"
             aria-haspopup="true"
-            aria-expanded="false"
+            aria-expanded={dropdownOpen ? "true" : "false"}
+            onClick={() => setDropdownOpen(!dropdownOpen)}
           >
             <span
               id="nombre-usuario"
@@ -65,37 +69,34 @@ export default function Topbar() {
               src="img/undraw_profile.svg"
               alt="Perfil"
             />
-            <div className="input-group-append">
-              <button className="btn btn-primary" type="button">
-                <i className="fas fa-search fa-sm"></i>
-              </button>
-            </div>
-          </div>
-        </form>
+          </a>
 
           {/* Dropdown - User Information */}
-          <div
-            className="dropdown-menu dropdown-menu-right shadow animated--grow-in"
-            aria-labelledby="userDropdown"
-          >
-            {/* Perfil según rol */}
-            <Link className="dropdown-item" to={`/${prefix}/perfil`}>
-              <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-              Perfil
-            </Link>
-
-            <div className="dropdown-divider"></div>
-
-            {/* Cerrar sesión */}
-            <button
-              className="dropdown-item"
-              onClick={handleLogout}
-              style={{ cursor: "pointer" }}
+          {dropdownOpen && (
+            <div
+              className="dropdown-menu dropdown-menu-right shadow animated--grow-in show"
+              aria-labelledby="userDropdown"
             >
-              <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-              Cerrar Sesión
-            </button>
-          </div>
+              <Link className="dropdown-item" to={`/${prefix}/perfil`} onClick={closeDropdown}>
+                <i className="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                Perfil
+              </Link>
+
+              <div className="dropdown-divider"></div>
+
+              <button
+                className="dropdown-item"
+                onClick={() => {
+                  closeDropdown();
+                  handleLogout();
+                }}
+                style={{ cursor: "pointer" }}
+              >
+                <i className="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                Cerrar Sesión
+              </button>
+            </div>
+          )}
         </li>
       </ul>
     </nav>
