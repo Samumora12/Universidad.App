@@ -3,69 +3,67 @@ import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 
-function ListarEstudiante() {
-  const [estudiantes, setEstudiantes] = useState([]);
+function ListarDocente() {
+  const [docentes, setDocentes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [estudianteAEliminar, setEstudianteAEliminar] = useState(null);
+  const [docenteAEliminar, setDocenteAEliminar] = useState(null);
   const [showModal, setShowModal] = useState(false);
   
   const navigate = useNavigate();
   const { user } = useAuth();
 
   useEffect(() => {
-    cargarEstudiantes();
+    cargarDocentes();
   }, []);
 
-  const cargarEstudiantes = async () => {
+  const cargarDocentes = async () => {
     try {
       setLoading(true);
       const response = await api.get('/usuarios');
       
-      const estudiantesFiltrados = response.data.filter(
-        (usuario) => usuario.rol === 'Estudiante'
+      const docentesFiltrados = response.data.filter(
+        (usuario) => usuario.rol === 'Docente'
       );
       
-      setEstudiantes(estudiantesFiltrados);
+      setDocentes(docentesFiltrados);
       setError('');
     } catch (err) {
-      console.error('Error al cargar estudiantes:', err);
-      setError('Error al cargar la lista de estudiantes');
+      console.error('Error al cargar docentes:', err);
+      setError('Error al cargar la lista de docentes');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEditar = (estudiante) => {
-    navigate('/EditarEstudiante', { state: { estudiante } });
+  const handleEditar = (docente) => {
+    navigate('/EditarDocente', { state: { docente } });
   };
 
-  const abrirModalEliminar = (estudiante) => {
-    setEstudianteAEliminar(estudiante);
+  const abrirModalEliminar = (docente) => {
+    setDocenteAEliminar(docente);
     setShowModal(true);
   };
 
   const cerrarModal = () => {
-    setEstudianteAEliminar(null);
+    setDocenteAEliminar(null);
     setShowModal(false);
   };
 
   const confirmarEliminar = async () => {
-    if (!estudianteAEliminar || !estudianteAEliminar.correo) {
-      alert('No se puede eliminar: correo de estudiante no disponible');
+    if (!docenteAEliminar || !docenteAEliminar.correo) {
+      alert('No se puede eliminar: correo de docente no disponible');
       return;
     }
 
     try {
-      // Paso 1: Buscar el ID del estudiante usando el nuevo endpoint
-      const estudianteResponse = await api.get(`/usuarios/correo/${estudianteAEliminar.correo}`);
+      const docenteResponse = await api.get(`/usuarios/correo/${docenteAEliminar.correo}`);
       
-      if (!estudianteResponse.data || !estudianteResponse.data.id) {
-        alert('Error: No se pudo encontrar el ID del estudiante');
+      if (!docenteResponse.data || !docenteResponse.data.id) {
+        alert('Error: No se pudo encontrar el ID del docente');
         return;
       }
 
-      // Paso 2: Buscar el ID del admin
       const adminResponse = await api.get(`/usuarios/correo/${user?.correo}`);
       
       if (!adminResponse.data || !adminResponse.data.id) {
@@ -73,30 +71,27 @@ function ListarEstudiante() {
         return;
       }
 
-      // Paso 3: Eliminar usando los IDs obtenidos
-      await api.delete(`/usuarios/admin/${adminResponse.data.id}/usuarios/${estudianteResponse.data.id}`);
+      await api.delete(`/usuarios/admin/${adminResponse.data.id}/usuarios/${docenteResponse.data.id}`);
       
-      alert('Estudiante eliminado correctamente');
+      alert('Docente eliminado correctamente');
       cerrarModal();
-      cargarEstudiantes();
+      cargarDocentes();
     } catch (err) {
-      console.error('Error al eliminar estudiante:', err);
-      alert(err.response?.data || 'Error al eliminar el estudiante');
+      console.error('Error al eliminar docente:', err);
+      alert(err.response?.data || 'Error al eliminar el docente');
     }
   };
 
   return (
     <div className="container-fluid">
-      {/* Page Heading */}
       <div className="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 className="h3 mb-0 text-gray-800">Mis Estudiantes</h1>
+        <h1 className="h3 mb-0 text-gray-800">Mis Docentes</h1>
       </div>
 
-      {/* Tabla de Estudiantes */}
       <div className="card shadow mb-4">
         <div className="card-header py-3">
           <h6 className="m-0 font-weight-bold text-primary">
-            Lista de Estudiantes Registrados
+            Lista de Docentes Registrados
           </h6>
         </div>
         <div className="card-body">
@@ -110,9 +105,9 @@ function ListarEstudiante() {
             <div className="alert alert-danger" role="alert">
               {error}
             </div>
-          ) : estudiantes.length === 0 ? (
+          ) : docentes.length === 0 ? (
             <div className="alert alert-info" role="alert">
-              No hay estudiantes registrados.
+              No hay docentes registrados.
             </div>
           ) : (
             <div className="table-responsive">
@@ -122,29 +117,35 @@ function ListarEstudiante() {
                     <th>Nombre</th>
                     <th>Correo</th>
                     <th>Rol</th>
+                    <th>Estado</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {estudiantes.map((estudiante, index) => (
+                  {docentes.map((docente, index) => (
                     <tr key={index}>
-                      <td>{estudiante.nombre}</td>
-                      <td>{estudiante.correo}</td>
+                      <td>{docente.nombre}</td>
+                      <td>{docente.correo}</td>
                       <td>
-                        <span className="badge badge-primary">
-                          {estudiante.rol}
+                        <span className="badge badge-success">
+                          {docente.rol}
+                        </span>
+                      </td>
+                      <td>
+                        <span className={`badge ${docente.estado === 'Activo' ? 'badge-info' : 'badge-secondary'}`}>
+                          {docente.estado || 'Activo'}
                         </span>
                       </td>
                       <td>
                         <button 
                           className="btn btn-sm btn-warning mr-2"
-                          onClick={() => handleEditar(estudiante)}
+                          onClick={() => handleEditar(docente)}
                         >
                           <i className="fas fa-edit"></i> Editar
                         </button>
                         <button 
                           className="btn btn-sm btn-danger"
-                          onClick={() => abrirModalEliminar(estudiante)}
+                          onClick={() => abrirModalEliminar(docente)}
                         >
                           <i className="fas fa-trash"></i> Eliminar
                         </button>
@@ -158,7 +159,6 @@ function ListarEstudiante() {
         </div>
       </div>
 
-      {/* Modal de Confirmación de Eliminación */}
       {showModal && (
         <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)' }} onClick={cerrarModal}>
           <div className="modal-dialog" onClick={(e) => e.stopPropagation()}>
@@ -170,7 +170,7 @@ function ListarEstudiante() {
                 </button>
               </div>
               <div className="modal-body">
-                <p>¿Estás seguro de que deseas eliminar al estudiante <strong>{estudianteAEliminar?.nombre}</strong>?</p>
+                <p>¿Estás seguro de que deseas eliminar al docente <strong>{docenteAEliminar?.nombre}</strong>?</p>
                 <p className="text-danger"><small>Esta acción no se puede deshacer.</small></p>
               </div>
               <div className="modal-footer">
@@ -189,4 +189,4 @@ function ListarEstudiante() {
   );
 }
 
-export default ListarEstudiante;
+export default ListarDocente;
