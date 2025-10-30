@@ -6,6 +6,9 @@ function Register() {
   const navigate = useNavigate();
   const { registerUser } = useAuth();
 
+  // 🟢 Estado para controlar el botón de carga
+  const [loading, setLoading] = useState(false);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -23,25 +26,30 @@ function Register() {
   };
 
   const handleSubmit = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
+    setLoading(true); // 🔵 activamos loading mientras se registra
 
-  console.log("📦 Datos del formulario:", formData);
+    console.log("📦 Datos del formulario:", formData);
 
-  if (formData.password !== formData.repeatPassword) {
-    alert("Las contraseñas no coinciden");
-    return;
-  }
+    if (formData.password !== formData.repeatPassword) {
+      alert("Las contraseñas no coinciden");
+      setLoading(false);
+      return;
+    }
 
-  const success = await registerUser(formData);
+    const success = await registerUser(formData);
 
-  if (success) {
-    console.log("✅ Registro exitoso. Redirigiendo al login...");
-    alert("Registro exitoso. Ahora puedes iniciar sesión.");
-    navigate("/login"); // 👈 Redirige al login después de registrarse
-  } else {
-    console.error("❌ Error al registrarse");
-  }
-};
+    if (success) {
+      console.log("✅ Registro exitoso. Redirigiendo al login...");
+      alert("Registro exitoso. Ahora puedes iniciar sesión.");
+      navigate("/login");
+    } else {
+      console.error("❌ Error al registrarse");
+      alert("Hubo un problema al registrarte. Intenta de nuevo.");
+    }
+
+    setLoading(false); // 🔵 desactivamos loading al final
+  };
 
   return (
     <div className="container">
@@ -134,8 +142,9 @@ function Register() {
                   <button
                     type="submit"
                     className="btn btn-primary btn-user btn-block"
+                    disabled={loading} // 🟢 se desactiva mientras carga
                   >
-                    Crear cuenta
+                    {loading ? "Registrando..." : "Crear cuenta"}
                   </button>
 
                   <hr />
